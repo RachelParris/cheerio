@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-// const ObjectId = Schema.ObjectId;
  
 const ArticleSchema = new Schema({
   author: String,
@@ -11,8 +10,8 @@ const ArticleSchema = new Schema({
   author_url: String,
   date: Date,
   // `notes` is an array that stores ObjectIds
-  // The ref property links these ObjectIds to the Book model
-  // This allows us to populate the Library with any associated Books
+  // The ref property links these ObjectIds to the Note model
+  // This allows us to populate the Article model with any associated Notes
   notes: [
     {
       type: Schema.Types.ObjectId,
@@ -23,5 +22,4 @@ const ArticleSchema = new Schema({
 
 const Article = mongoose.model("Article", ArticleSchema);
 
-// Export the Article model
 module.exports = Article;

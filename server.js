@@ -1,19 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const apiRoutes = require('./routes/api-routes');
 const app = express();
 require('dotenv').config();
 
+
+// Setup mongoose
 mongoose.Promise = global.Promise;
 mongoose.connect(`${process.env.MONGO_URI}`);
 
-// parse application/x-www-form-urlencoded
+// Parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-// parse application/json
+// Parse application/json
 app.use(bodyParser.json());
 
-app.use(require('./routes/api-routes'));
+// Use API routes
+app.use('/api', apiRoutes);
 
-app.listen(3005, function () {
-  console.log('App listening on port: ', 3005);
+// Listen to server
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`App listening on port: ${PORT}`);
 });
