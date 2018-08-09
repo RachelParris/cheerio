@@ -1,8 +1,7 @@
 const express = require('express');
 const request = require('request');
 const cheerio = require('cheerio');
-// const mongoose = require('mongoose');
-const Article = require('../models/articleModel');
+const db = require('../models');
 const routes = express.Router();
 
 function getData (data) {
@@ -24,7 +23,7 @@ function getData (data) {
   return articles;
 }
 
-routes.get('/addarticles/:topic?', function (req, res) {
+routes.get('/articles/new/:topic?', function (req, res) {
   const topic = req.params.topic || 'popular';
 
   request('https://medium.com/topic/' + topic, function (err, response, body) {
@@ -36,7 +35,7 @@ routes.get('/addarticles/:topic?', function (req, res) {
     res.json(data);
 
     data.forEach(item => {
-      let article = new Article({
+      let article = new db.Article({
         author: item.author,
         title: item.title,
         body: item.summary,
@@ -54,8 +53,32 @@ routes.get('/addarticles/:topic?', function (req, res) {
 
 routes.get('/articles', function (req, res) {
   // Get all articles from db
-  Article.find({}, function (err, docs) {
+  db.Article.find({}, function (err, docs) {
     res.json(docs);
   });
+});
+
+routes.get('/articles/:id', function (req, res) {
+  const id = req.params.id;
+
+  db.Article.findOne({_id: id})
+    .populate('notes')
+    .then(function (article) {
+      res.json(article);
+    });
+});
+
+routes.post('/articles/:id', function (req, res) {
+  const id = req.params.id;
+  const body = req.body;
+
+  db.Note.create(body)
+    .then(function (note) {
+      db.Article.findOneAndUpdate({}, {$push: { notes: note._id}})
+        .then(function (article) {
+          res.json(article)
+        });
+    })
+  
 });
 module.exports = routes;
